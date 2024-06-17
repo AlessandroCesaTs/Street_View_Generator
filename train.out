@@ -1,142 +1,28 @@
-cuda
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-Epoch 0  Loss:122.3974838256836
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-done batch
-Epoch 2  Loss:37.06657791137695
-Completed training with lowest loss: 2137.40478515625 reached at EPOCH: 2; Time: 48.652008056640625
-/orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/source/train.py:81: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
-  plt.legend()
+started learning rate 0.00005
+Epoch 0  Loss:2510191.5555555555
+Epoch 10  Loss:989351.6666666666
+Epoch 20  Loss:867417.6111111111
+Epoch 30  Loss:822314.0
+Epoch 40  Loss:803885.3333333334
+Epoch 50  Loss:793467.9444444445
+Epoch 60  Loss:785823.2777777778
+Epoch 70  Loss:779926.7777777778
+Epoch 80  Loss:775032.8333333334
+Epoch 90  Loss:771299.5555555555
+Epoch 100  Loss:767879.0555555555
+Epoch 110  Loss:765563.5555555555
+Epoch 120  Loss:763967.7222222222
+Epoch 130  Loss:762398.6111111111
+Epoch 140  Loss:762613.9444444445
+Epoch 150  Loss:761844.7777777778
+Epoch 160  Loss:758896.1111111111
+Epoch 170  Loss:758884.6111111111
+Epoch 180  Loss:758667.1111111111
+Epoch 190  Loss:758112.5
+Epoch 200  Loss:757938.2222222222
+Epoch 210  Loss:758031.5
+Epoch 220  Loss:753203.7222222222
+Epoch 229  Loss:750885.0555555555
+Completed training with lowest loss: 750885.0555555555 reached at EPOCH: 229; Time: 53.177297170956926
+done learning rate 0.00005
 done

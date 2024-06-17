@@ -13,6 +13,11 @@
 
 source environment/bin/activate
 
-python -u source/train.py --epochs=3 --batch_size=1024
+for learning_rate in 0.00005
+do
+    echo "started learning rate $learning_rate"
+    python -u source/train.py --epochs=230 --learning_rate=$learning_rate --batch_size=1024
+    echo "done learning rate $learning_rate"
+done
 
 echo "done"
