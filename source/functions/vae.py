@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from source.functions.one_hot_encode import *
 
 def make_conv_block(in_channels:int,
     out_channels:int,
@@ -91,8 +92,10 @@ class VariationalAutoEncoder(nn.Module):
         return self.decoder(x),mu,log_var
     
     def generate(self,input_label):
-        latent=torch.randn(30).to(input_label.device)
-        x=torch.cat((latent,input_label),dim=1)
+        encoded_label=one_hot_encode(input_label)
+        latent=torch.randn(30).to(encoded_label.device)
+        x=torch.cat((latent,encoded_label),dim=0)
         x=self.label_re_encoder(x)
+        x=x.view((-1,256,8,8))
         return self.decoder(x)
         
