@@ -13,11 +13,12 @@
 
 source environment/bin/activate
 
-for learning_rate in 0.00005
+for latent_dim in 256
 do
-    echo "started learning rate $learning_rate"
-    python -u source/train.py --epochs=230 --learning_rate=$learning_rate --batch_size=1024
-    echo "done learning rate $learning_rate"
+    echo "started latent_dim $latent_dim"
+    python -u source/train.py --epochs=225 --learning_rate=0.00005 --batch_size=1024 --latent_dim=$latent_dim
+    echo "done latent_dim $latent_dim"
 done
 
 echo "done"
+

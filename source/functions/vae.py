@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from source.functions.one_hot_encode import *
+from .one_hot_encode import *
 
 def make_conv_block(in_channels:int,
     out_channels:int,
@@ -44,11 +44,11 @@ def label_encoder():
     )
 
 class LinearNeck(nn.Module):
-    def __init__(self):
+    def __init__(self,latent_dim):
         super().__init__()
-        self.fc=nn.Linear(256*8*8+40,30)
-        self.to_mu=nn.Linear(30,30)
-        self.to_log_var=nn.Linear(30,30)
+        self.fc=nn.Linear(256*8*8+40,latent_dim)
+        self.to_mu=nn.Linear(latent_dim,latent_dim)
+        self.to_log_var=nn.Linear(latent_dim,latent_dim)
     def forward(self,encoded_image,encoded_label):
         x=torch.cat((encoded_image,encoded_label),dim=1)
         x=F.relu(self.fc(x))
@@ -73,14 +73,15 @@ def decoder():
     )
 
 class VariationalAutoEncoder(nn.Module):
-    def __init__(self):
+    def __init__(self,latent_dim):
         super().__init__()
+        self.latent_dim=latent_dim
 
         self.image_encoder=image_encoder()
         self.label_encoder=label_encoder()
-        self.linear_neck=LinearNeck()
+        self.linear_neck=LinearNeck(self.latent_dim)
         self.sampler=GaussianReparametrizerSampler()
-        self.label_re_encoder=nn.Linear(30+40,256*8*8)
+        self.label_re_encoder=nn.Linear(self.latent_dim+40,256*8*8)
         self.decoder=decoder()
     
     def forward(self,input_image:torch.Tensor,input_label:torch.Tensor)->tuple[torch.Tensor,torch.Tensor,torch.Tensor]:
@@ -93,9 +94,10 @@ class VariationalAutoEncoder(nn.Module):
     
     def generate(self,input_label):
         encoded_label=one_hot_encode(input_label)
-        latent=torch.randn(30).to(encoded_label.device)
+        latent=torch.randn(self.latent_dim).to(encoded_label.device)
         x=torch.cat((latent,encoded_label),dim=0)
         x=self.label_re_encoder(x)
         x=x.view((-1,256,8,8))
         return self.decoder(x)
         
+
