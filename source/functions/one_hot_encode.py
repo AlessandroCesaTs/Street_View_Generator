@@ -1,4 +1,3 @@
-import os
 import torch
 
 def one_hot_encode(country):
