@@ -1,5 +1,5 @@
 import argparse
-import torch
+import warnings
 import torch.optim as optim
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -11,6 +11,7 @@ from functions.losses import *
 from functions.ddp_setup import ddp_setup
 from functions.data_handling import prepare_data
 from functions.training_functions import train
+from functions.scheduler import lr_scheduler
 
 def main(rank:int,world_size:int):
 
@@ -34,8 +35,10 @@ def main(rank:int,world_size:int):
     model=DDP(model,device_ids=[rank])
     optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0)
 
+    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=LEARNING_RATE*1e-2,steady_lr=LEARNING_RATE,final_lr=LEARNING_RATE*1e-2,total_epochs=EPOCHS)
+
     train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-           validation_loader, model, optimizer)
+           validation_loader, model, optimizer,scheduler)
     destroy_process_group()
 
 if __name__ =="__main__":

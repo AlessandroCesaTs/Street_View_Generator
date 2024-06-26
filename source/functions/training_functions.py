@@ -5,7 +5,7 @@ from torch.distributed import ReduceOp, reduce
 from .losses import beta_gaussian_kldiv, mse_loss
 
 def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-          validation_loader, model, optimizer):
+          validation_loader, model, optimizer,scheduler):
 
     if rank==0:
         train_losses=[]
@@ -25,6 +25,7 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
 
             evaluate(model,validation_loader, rank,
                       validation_losses if rank==0 else None)
+            
 
             if rank==0:
                 if validation_losses[-1]<lowest_validation_loss:
@@ -34,6 +35,7 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
 
                 if epoch%10==0 or epoch==EPOCHS-1:
                     print(f"Epoch {epoch}  Loss:{validation_losses[-1]}",flush=True)
+        scheduler.step()
 
     if rank==0:
         print(f"Completed training with lowest loss: {lowest_validation_loss} reached at EPOCH: {lowest_validation_loss_epoch}; Time: {(time.time()-start_time)/60}",flush=True)
