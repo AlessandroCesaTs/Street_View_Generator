@@ -39,14 +39,20 @@ def image_encoder():
 
 def label_encoder():
     return nn.Sequential(
-        nn.Linear(40,40),
-        nn.ReLU()
+        nn.Linear(40,160),
+        nn.LeakyReLU(negative_slope=0.2)
+    )
+
+def label_re_encoder(latent_dim):
+    return nn.Sequential(
+        nn.Linear(latent_dim+160,256*8*8),
+        nn.LeakyReLU(negative_slope=0.2)
     )
 
 class LinearNeck(nn.Module):
     def __init__(self,latent_dim):
         super().__init__()
-        self.fc=nn.Linear(256*8*8+40,latent_dim)
+        self.fc=nn.Linear(256*8*8+160,latent_dim)
         self.to_mu=nn.Linear(latent_dim,latent_dim)
         self.to_log_var=nn.Linear(latent_dim,latent_dim)
     def forward(self,encoded_image,encoded_label):
@@ -81,13 +87,13 @@ class VariationalAutoEncoder(nn.Module):
         self.label_encoder=label_encoder()
         self.linear_neck=LinearNeck(self.latent_dim)
         self.sampler=GaussianReparametrizerSampler()
-        self.label_re_encoder=nn.Linear(self.latent_dim+40,256*8*8)
+        self.label_re_encoder=label_re_encoder(self.latent_dim)
         self.decoder=decoder()
     
     def forward(self,input_image:torch.Tensor,input_label:torch.Tensor)->tuple[torch.Tensor,torch.Tensor,torch.Tensor]:
         mu,log_var=self.linear_neck(self.image_encoder(input_image),self.label_encoder(input_label))
         latent=self.sampler(mu,log_var)
-        x=torch.cat((latent,input_label),dim=1)
+        x=torch.cat((latent,self.label_encoder(input_label)),dim=1)
         x=self.label_re_encoder(x)
         x=x.view((-1,256,8,8))
         return self.decoder(x),mu,log_var
@@ -95,7 +101,7 @@ class VariationalAutoEncoder(nn.Module):
     def generate(self,input_label):
         encoded_label=one_hot_encode(input_label)
         latent=torch.randn(self.latent_dim).to(encoded_label.device)
-        x=torch.cat((latent,encoded_label),dim=0)
+        x=torch.cat((latent,self.label_encoder(encoded_label)),dim=0)
         x=self.label_re_encoder(x)
         x=x.view((-1,256,8,8))
         return self.decoder(x)
