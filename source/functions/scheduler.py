@@ -8,16 +8,16 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
                  total_epochs:int):
     
     epochs_fraction=int(total_epochs/3)
-
+    
+    """
     warmup_epochs=epochs_fraction
     steady_epochs=epochs_fraction
     anneal_epochs=total_epochs-2*epochs_fraction
-    
     """
     warmup_epochs=int(total_epochs/3)
     steady_epochs=0
     anneal_epochs=total_epochs-warmup_epochs
-    """
+    
 
     for grp in optimizer.param_groups:
         grp["lr"]=steady_lr

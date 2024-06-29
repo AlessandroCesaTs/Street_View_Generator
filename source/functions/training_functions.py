@@ -5,14 +5,10 @@ from torch.distributed import ReduceOp, reduce
 from .losses import beta_gaussian_kldiv, mse_loss
 
 def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-          validation_loader, model, optimizer,scheduler):
+           model, optimizer,scheduler):
 
     if rank==0:
         train_losses=[]
-        validation_losses=[]
-        lowest_validation_loss=float('inf')
-        lowest_validation_loss_epoch=0
-        best_weights=model.module.state_dict()
         start_time=time.time()
 
     for epoch in range(EPOCHS):
@@ -23,26 +19,20 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
             evaluate(model,train_loader,rank, 
                      train_losses if rank==0 else None)
 
-            evaluate(model,validation_loader, rank,
-                      validation_losses if rank==0 else None)
             
 
             if rank==0:
-                if validation_losses[-1]<lowest_validation_loss:
-                    lowest_validation_loss=validation_losses[-1]
-                    lowest_validation_loss_epoch=epoch
-                    best_weights=model.module.state_dict()
 
                 if epoch%10==0 or epoch==EPOCHS-1:
-                    print(f"Epoch {epoch}  Loss:{validation_losses[-1]}",flush=True)
+                    print(f"Epoch {epoch}  Loss:{train_losses[-1]}",flush=True)
         scheduler.step()
 
     if rank==0:
-        print(f"Completed training with lowest loss: {lowest_validation_loss} reached at EPOCH: {lowest_validation_loss_epoch}; Time: {(time.time()-start_time)/60}",flush=True)
+        print(f"Completed training with loss: {train_losses[-1]}; Time: {(time.time()-start_time)/60}",flush=True)
 
-        torch.save(best_weights,'models/model'+str(LEARNING_RATE)+'_'+str(LATENT_DIM)+'.pt')
+        torch.save(model.module.state_dict(),'models/model'+str(LEARNING_RATE)+'_'+str(LATENT_DIM)+'.pt')
 
-        plot_losses(LEARNING_RATE, LATENT_DIM, train_losses, validation_losses)
+        plot_losses(LEARNING_RATE, LATENT_DIM, train_losses)
 
 
 def train_epoch( model, optimizer,data_loader,device):
@@ -78,9 +68,8 @@ def evaluate(model,data_loader,device, losses=None):
         losses.append(avg_loss.item())
 
 
-def plot_losses(LEARNING_RATE, LATENT_DIM, train_losses, validation_losses):
+def plot_losses(LEARNING_RATE, LATENT_DIM, train_losses):
     plt.plot(train_losses,label='Train')
-    plt.plot(validation_losses,label='Validation')
     plt.xlabel("Epoch")
     plt.ylabel("Reconstruction Loss")
     plt.legend()

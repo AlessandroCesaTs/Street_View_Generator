@@ -19,11 +19,9 @@ class CustomDataset(Dataset):
 def prepare_data(data_path,world_size, BATCH_SIZE):
     data=torch.load(data_path)
     dataset=CustomDataset(data)
-    train_set,validation_set=random_split(dataset,[0.8,0.2])
 
     batch_size_per_process=int(BATCH_SIZE/world_size)
 
-    train_loader=DataLoader(train_set,batch_size=batch_size_per_process,shuffle=False,sampler=DistributedSampler(train_set))
-    validation_loader=DataLoader(validation_set,batch_size=batch_size_per_process,shuffle=False,sampler=DistributedSampler(validation_set))
-    return train_loader,validation_loader
+    data_loader=DataLoader(dataset,batch_size=batch_size_per_process,shuffle=False,sampler=DistributedSampler(dataset))
+    return data_loader
     

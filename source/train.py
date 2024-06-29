@@ -29,16 +29,16 @@ def main(rank:int,world_size:int):
     BATCH_SIZE = args.batch_size
     LATENT_DIM = args.latent_dim
 
-    train_loader, validation_loader = prepare_data('/u/dssc/acesa000/fast/Street_View_Generator_data/dataset.pt',world_size, BATCH_SIZE)
+    train_loader= prepare_data('/u/dssc/acesa000/fast/Street_View_Generator_data/dataset.pt',world_size, BATCH_SIZE)
 
     model=VariationalAutoEncoder(LATENT_DIM).to(rank)
     model=DDP(model,device_ids=[rank])
     optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0)
 
-    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=LEARNING_RATE*1e-2,steady_lr=LEARNING_RATE,final_lr=LEARNING_RATE*1e-2,total_epochs=EPOCHS)
+    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=1e-4,steady_lr=0.001,final_lr=1e-6,total_epochs=EPOCHS)
 
     train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-           validation_loader, model, optimizer,scheduler)
+            model, optimizer,scheduler)
     destroy_process_group()
 
 if __name__ =="__main__":
