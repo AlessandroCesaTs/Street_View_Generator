@@ -37,15 +37,15 @@ def image_encoder():
         nn.Flatten()
     )
 
-def label_encoder():
+def label_embedder(label_embedding_dim):
     return nn.Sequential(
-        nn.Linear(40,160),
+        nn.Linear(40,label_embedding_dim),
         nn.LeakyReLU(negative_slope=0.2)
     )
 
-def label_re_encoder(latent_dim):
+def linear_with_label(latent_dim,label_embedding_dim):
     return nn.Sequential(
-        nn.Linear(latent_dim+160,256*8*8),
+        nn.Linear(latent_dim+label_embedding_dim,256*8*8),
         nn.LeakyReLU(negative_slope=0.2)
     )
 
@@ -79,30 +79,31 @@ def decoder():
     )
 
 class VariationalAutoEncoder(nn.Module):
-    def __init__(self,latent_dim):
+    def __init__(self,latent_dim=256,label_embedding_dim=160):
         super().__init__()
         self.latent_dim=latent_dim
+        self.label_embedding_dim=label_embedding_dim
 
         self.image_encoder=image_encoder()
-        self.label_encoder=label_encoder()
+        self.label_embedder=label_embedder(self.label_embedding_dim)
         self.linear_neck=LinearNeck(self.latent_dim)
         self.sampler=GaussianReparametrizerSampler()
-        self.label_re_encoder=label_re_encoder(self.latent_dim)
+        self.linear_with_label=linear_with_label(self.latent_dim,self.label_embedding_dim)
         self.decoder=decoder()
     
     def forward(self,input_image:torch.Tensor,input_label:torch.Tensor)->tuple[torch.Tensor,torch.Tensor,torch.Tensor]:
-        mu,log_var=self.linear_neck(self.image_encoder(input_image),self.label_encoder(input_label))
+        mu,log_var=self.linear_neck(self.image_encoder(input_image),self.label_embedder(input_label))
         latent=self.sampler(mu,log_var)
-        x=torch.cat((latent,self.label_encoder(input_label)),dim=1)
-        x=self.label_re_encoder(x)
+        x=torch.cat((latent,self.label_embedder(input_label)),dim=1)
+        x=self.linear_with_label(x)
         x=x.view((-1,256,8,8))
         return self.decoder(x),mu,log_var
     
     def generate(self,input_label):
         encoded_label=one_hot_encode(input_label)
         latent=torch.randn(self.latent_dim).to(encoded_label.device)
-        x=torch.cat((latent,self.label_encoder(encoded_label)),dim=0)
-        x=self.label_re_encoder(x)
+        x=torch.cat((latent,self.label_embedder(encoded_label)),dim=0)
+        x=self.linear_with_label(x)
         x=x.view((-1,256,8,8))
         return self.decoder(x)
         

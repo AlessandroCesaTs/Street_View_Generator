@@ -35,10 +35,10 @@ def main(rank:int,world_size:int):
     model=DDP(model,device_ids=[rank])
     optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0)
 
-    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=1e-4,steady_lr=0.001,final_lr=1e-6,total_epochs=EPOCHS)
+    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=1e-4,steady_lr=0.002,final_lr=1e-6,total_epochs=EPOCHS)
 
     train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-            model, optimizer,scheduler)
+            model, optimizer,scheduler) 
     destroy_process_group()
 
 if __name__ =="__main__":
