@@ -1,44 +1,44 @@
 started latent_dim 256
-Epoch 0  Loss:1832315.0
-Epoch 10  Loss:709216.125
-Epoch 20  Loss:644907.3125
-Epoch 30  Loss:632799.4375
+Epoch 0  Loss:2242722.5
+Epoch 10  Loss:709440.625
+Epoch 20  Loss:645810.125
+Epoch 30  Loss:628146.5625
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
-Epoch 40  Loss:612925.8125
-Epoch 50  Loss:605951.3125
-Epoch 60  Loss:602282.625
-Epoch 70  Loss:590173.5625
-Epoch 80  Loss:583374.375
-Epoch 90  Loss:581799.875
-Epoch 100  Loss:576971.375
-Epoch 110  Loss:572345.5
-Epoch 120  Loss:563088.125
-Epoch 130  Loss:566600.5625
-Epoch 140  Loss:555139.75
-Epoch 150  Loss:554034.25
-Epoch 160  Loss:551993.0
-Epoch 170  Loss:547178.625
-Epoch 180  Loss:541984.5
-Epoch 190  Loss:545246.25
-Epoch 200  Loss:539031.25
-Epoch 210  Loss:534553.4375
-Epoch 220  Loss:533645.0
-Epoch 230  Loss:530933.375
-Epoch 240  Loss:530808.625
-Epoch 250  Loss:531360.875
-Epoch 260  Loss:523489.5625
-Epoch 270  Loss:521198.40625
-Epoch 280  Loss:518810.3125
-Epoch 290  Loss:517833.34375
-Epoch 300  Loss:516291.1875
-Epoch 310  Loss:514271.03125
-Epoch 320  Loss:513075.03125
-Epoch 330  Loss:510799.84375
-Epoch 340  Loss:509474.125
-Epoch 349  Loss:508355.65625
-Completed training with loss: 508355.65625; Time: 53.76826079289118
+Epoch 40  Loss:612759.0625
+Epoch 50  Loss:603912.0
+Epoch 60  Loss:593741.375
+Epoch 70  Loss:591427.375
+Epoch 80  Loss:587434.375
+Epoch 90  Loss:578145.75
+Epoch 100  Loss:577551.75
+Epoch 110  Loss:574140.75
+Epoch 120  Loss:566852.25
+Epoch 130  Loss:567359.5625
+Epoch 140  Loss:563697.125
+Epoch 150  Loss:558742.25
+Epoch 160  Loss:554269.4375
+Epoch 170  Loss:555595.125
+Epoch 180  Loss:545299.25
+Epoch 190  Loss:546742.75
+Epoch 200  Loss:548722.8125
+Epoch 210  Loss:547161.25
+Epoch 220  Loss:539859.0
+Epoch 230  Loss:536652.4375
+Epoch 240  Loss:535038.0625
+Epoch 250  Loss:532711.0
+Epoch 260  Loss:528840.0
+Epoch 270  Loss:526985.25
+Epoch 280  Loss:526467.25
+Epoch 290  Loss:524687.625
+Epoch 300  Loss:523111.34375
+Epoch 310  Loss:520619.4375
+Epoch 320  Loss:519341.21875
+Epoch 330  Loss:518327.28125
+Epoch 340  Loss:516907.15625
+Epoch 349  Loss:515765.9375
+Completed training with loss: 515765.9375; Time: 50.63616591294606
 done latent_dim 256
 done

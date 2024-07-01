@@ -72,10 +72,10 @@ class GaussianReparametrizerSampler(nn.Module):
 def decoder():
     return nn.Sequential(
         make_deconv_block(256,256,3,1,1), #8->8
-        make_deconv_block(256,128,4,2,1), #8->16
-        make_deconv_block(128,64,4,2,1),  #16->32
-        make_deconv_block(64,32,4,2,1),   #32->64
-        nn.ConvTranspose2d(32,3,4,2,1,bias=True), #64->128
+        make_deconv_block(256,128,3,2,1,1), #8->16
+        make_deconv_block(128,64,3,2,1,1),  #16->32
+        make_deconv_block(64,32,3,2,1,1),   #32->64
+        nn.ConvTranspose2d(32,3,3,2,1,1,bias=True), #64->128
         nn.Sigmoid()
     )
 
