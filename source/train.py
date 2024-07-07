@@ -29,11 +29,11 @@ def main(rank:int,world_size:int):
     BATCH_SIZE = args.batch_size
     LATENT_DIM = args.latent_dim
 
-    train_loader= prepare_data('/u/dssc/acesa000/fast/Street_View_Generator_data/dataset.pt',world_size, BATCH_SIZE)
+    train_loader= prepare_data('/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset_processed.pt',world_size, BATCH_SIZE)
 
     model=VariationalAutoEncoder(LATENT_DIM).to(rank)
     model=DDP(model,device_ids=[rank])
-    optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0)
+    optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0,betas=(0.9,0.95))
 
     optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=1e-4,steady_lr=0.002,final_lr=1e-6,total_epochs=EPOCHS)
 
