@@ -37,9 +37,9 @@ def image_encoder():
         nn.Flatten()
     )
 
-def label_embedder(label_embedding_dim):
+def label_embedder(num_of_countries=84,label_embedding_dim=256):
     return nn.Sequential(
-        nn.Linear(154,label_embedding_dim),
+        nn.Linear(num_of_countries,label_embedding_dim),
         nn.LeakyReLU(negative_slope=0.2)
     )
 
@@ -80,14 +80,14 @@ def decoder():
     )
 
 class VariationalAutoEncoder(nn.Module):
-    def __init__(self,latent_dim=256,label_embedding_dim=512):
+    def __init__(self,latent_dim=256,num_of_countries=84,label_embedding_dim=256):
         super().__init__()
         self.latent_dim=latent_dim
         self.label_embedding_dim=label_embedding_dim
         self.name_handler=CountryNameHandler()
 
         self.image_encoder=image_encoder()
-        self.label_embedder=label_embedder(self.label_embedding_dim)
+        self.label_embedder=label_embedder(num_of_countries,self.label_embedding_dim)
         self.linear_neck=LinearNeck(self.latent_dim,self.label_embedding_dim)
         self.sampler=GaussianReparametrizerSampler()
         self.linear_with_label=linear_with_label(self.latent_dim,self.label_embedding_dim)

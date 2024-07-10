@@ -1,16 +1,19 @@
 started latent_dim 256
-Epoch 0  Loss:1054376.75
+Epoch 0  Loss:968725.625
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
-Epoch 10  Loss:454262.09375
-Epoch 20  Loss:423623.8125
-Epoch 30  Loss:410948.8125
-Epoch 40  Loss:405782.5625
-Epoch 50  Loss:398507.9375
-Epoch 60  Loss:391228.625
-Epoch 69  Loss:386717.34375
-Completed training with loss: 386717.34375; Time: 45.22760659853618
+Epoch 10  Loss:499653.5
+Epoch 20  Loss:435633.09375
+Epoch 30  Loss:424092.21875
+Epoch 40  Loss:409028.1875
+Epoch 50  Loss:406110.4375
+Epoch 60  Loss:399453.96875
+Epoch 70  Loss:393527.125
+Epoch 80  Loss:386610.8125
+Epoch 90  Loss:384289.375
+Epoch 99  Loss:380249.375
+Completed training with loss: 380249.375; Time: 52.805886312325796
 done latent_dim 256
 done

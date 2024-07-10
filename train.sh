@@ -16,7 +16,7 @@ source environment/bin/activate
 for latent_dim in 256
 do
     echo "started latent_dim $latent_dim"
-    srun python -u source/train.py --epochs=70 --learning_rate=0.00005 --batch_size=1024 --latent_dim=$latent_dim
+    srun python -u source/train.py --epochs=100 --learning_rate=0.00005 --batch_size=1024 --latent_dim=$latent_dim
     echo "done latent_dim $latent_dim"
 done
 

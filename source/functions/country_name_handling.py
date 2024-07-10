@@ -4,25 +4,24 @@ import torch
 class CountryNameHandler:
     def __init__(self):
         country_names = [
-            'Albania', 'Algeria', 'Angola', 'Argentina', 'Australia', 'Austria',
-            'Bahamas', 'Bangladesh', 'Belarus', 'Belgium', 'Belize', 'Bolivia',
-            'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon',
-            'Canada', 'Chad', 'Chile', 'China', 'Colombia', 'Democratic Republic of the Congo',
-            'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Denmark', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador',
-            'Eritrea', 'Estonia', 'Ethiopia', 'Fiji', 'Finland', 'France',
-            'Georgia', 'Germany', 'Ghana', 'Greece', 'Greenland', 'Grenada', 'Guatemala', 'Guinea', 'Guyana', 'Haiti',
-            'Honduras', 'Hong Kong', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy',
-            "Côte d'Ivoire", 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kosovo', 'Kuwait', 'Kyrgyzstan', 'Laos',
+            'Algeria',  'Argentina', 'Australia', 'Austria',
+            'Bangladesh', 'Belgium',
+            'Brazil', 'Bulgaria', 
+            'Canada', 'China', 'Colombia', 'Democratic Republic of the Congo',
+            'Croatia', 'Cyprus', 'Czechia', 'Denmark', 'Dominican Republic', 'Egypt',
+            'Ethiopia', 'Fiji', 'Finland', 'France',
+            'Germany', 'Ghana', 'Greece', 'Greenland', 
+            'Hong Kong', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Ireland', 'Italy',
+            "Côte d'Ivoire", 'Jamaica', 'Japan','Kazakhstan', 'Kenya',
             'Latvia', 'Lebanon', 'Libya', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi',
-            'Malaysia', 'Maldives', 'Mali', 'Malta', 'Mauritania', 'Mauritius', 'Mexico', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro',
-            'Morocco','Namibia', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua',
-            'Nigeria', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru',
-            'Philippines', 'Poland', 'Portugal', 'Puerto Rico', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saudi Arabia', 'Senegal',
-            'Serbia', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Somalia', 'South Africa', 'South Georgia', 'South Korea',
-             'Spain', 'Sri Lanka', 'Sudan', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand',
-             'Togo', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Uganda', 'Ukraine', 'United Arab Emirates',
-            'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
-        ]
+            'Malaysia', 'Maldives', 'Mali', 'Mexico', 
+            'Morocco','Namibia', 'Netherlands', 
+            'Nigeria',  'Norway', 'Pakistan', 'Papua New Guinea', 'Peru',
+            'Philippines', 'Portugal','Russia', 'Rwanda', 'Saudi Arabia', 'Senegal',
+            'Serbia','Singapore', 'South Africa', 'South Korea',
+            'Spain', 'Sudan', 'Sweden', 'Switzerland', 'Syria', 'Thailand',
+            'Tunisia', 'Turkey', 'Ukraine', 'United Arab Emirates',
+            'United Kingdom', 'United States', 'Venezuela', 'Vietnam', 'Yemen', 'Zimbabwe']
 
         self.iso_country_dict= {
     "AF": "Afghanistan",

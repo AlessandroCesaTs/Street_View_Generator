@@ -31,7 +31,7 @@ def main(rank:int,world_size:int):
 
     train_loader= prepare_data('/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset_processed.pt',world_size, BATCH_SIZE)
 
-    model=VariationalAutoEncoder(LATENT_DIM).to(rank)
+    model=VariationalAutoEncoder(latent_dim=LATENT_DIM).to(rank)
     model=DDP(model,device_ids=[rank])
     optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0,betas=(0.9,0.95))
 
