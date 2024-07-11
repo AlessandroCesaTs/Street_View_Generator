@@ -30,7 +30,7 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
     if rank==0:
         print(f"Completed training with loss: {train_losses[-1]}; Time: {(time.time()-start_time)/60}",flush=True)
 
-        torch.save(model.module.state_dict(),'models/model'+str(LEARNING_RATE)+'_'+str(LATENT_DIM)+'.pt')
+        torch.save(model.module.state_dict(),'models/model.pt')
 
         plot_losses(LEARNING_RATE, LATENT_DIM, train_losses)
 
@@ -73,4 +73,4 @@ def plot_losses(LEARNING_RATE, LATENT_DIM, train_losses):
     plt.xlabel("Epoch")
     plt.ylabel("Reconstruction Loss")
     plt.legend()
-    plt.savefig('plots/losses_plot_'+str(LEARNING_RATE)+'_'+str(LATENT_DIM)+'.png')
+    plt.savefig('plots/losses_plot.png')
