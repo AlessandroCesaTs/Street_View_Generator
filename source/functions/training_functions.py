@@ -1,14 +1,15 @@
 import torch
 import matplotlib.pyplot as plt
 import time
+import os
 from torch.distributed import ReduceOp, reduce
 from .losses import beta_gaussian_kldiv, mse_loss
 
 def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-           model, optimizer,scheduler):
+           model, optimizer,scheduler,fraction=0,total_fractions=1):
 
     if rank==0:
-        train_losses=[]
+        train_losses=[] if fraction==0 else torch.load('losses/losses.pt') 
         start_time=time.time()
 
     for epoch in range(EPOCHS):
@@ -18,8 +19,6 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
         with torch.no_grad():
             evaluate(model,train_loader,rank, 
                      train_losses if rank==0 else None)
-
-            
 
             if rank==0:
 
@@ -32,7 +31,11 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
 
         torch.save(model.module.state_dict(),'models/model.pt')
 
-        plot_losses(LEARNING_RATE, LATENT_DIM, train_losses)
+        if fraction!=total_fractions-1:
+            torch.save(train_losses,'losses/losses.pt')
+        else:
+            plot_losses(LEARNING_RATE, LATENT_DIM, train_losses)
+            os.remove('losses/losses.pt')
 
 
 def train_epoch( model, optimizer,data_loader,device):

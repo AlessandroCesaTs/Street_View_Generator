@@ -5,19 +5,12 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
                  initial_lr:float,
                  steady_lr:float,
                  final_lr:float,
-                 total_epochs:int):
+                 total_epochs:int,
+                 start_epoch:int=0):
     
-    epochs_fraction=int(total_epochs/3)
-    
-    """
-    warmup_epochs=epochs_fraction
-    steady_epochs=epochs_fraction
-    anneal_epochs=total_epochs-2*epochs_fraction
-    """
     warmup_epochs=int(total_epochs*0.1)
     steady_epochs=0
     anneal_epochs=total_epochs-warmup_epochs
-    
 
     for grp in optimizer.param_groups:
         grp["lr"]=steady_lr
@@ -47,5 +40,7 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
         schedulers=[warmup_scheduler,steady_scheduler,anneal_scheduler],
         milestones=[warmup_epochs,warmup_epochs+steady_epochs],
     )
+    
+    scheduler.last_epoch=start_epoch-1
 
     return optimizer,scheduler
