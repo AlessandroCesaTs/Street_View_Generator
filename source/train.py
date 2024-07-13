@@ -14,7 +14,7 @@ from functions.scheduler import lr_scheduler
 
 def main(rank:int,world_size:int):
 
-    ddp_setup(rank,world_size)
+    ddp_setup(rank,world_size,1234)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--fraction',type=int,default=0)
