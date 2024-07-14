@@ -3,16 +3,16 @@ Epoch 0  Loss:1074127.0
 Epoch 10  Loss:489587.25
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
-Epoch 20  Loss:464232.625
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
-Epoch 30  Loss:424450.3125
-Epoch 40  Loss:436979.5625
-Epoch 50  Loss:415050.8125
-Epoch 60  Loss:408269.40625
-Epoch 70  Loss:405179.5
-Epoch 80  Loss:400389.25
-Epoch 90  Loss:391940.4375
-Epoch 99  Loss:393631.53125
-Completed training with loss: 393631.53125; Time: 55.95669027964274
+Epoch 20  Loss:464232.625
+Epoch 30  Loss:437613.875
+Epoch 40  Loss:420112.5625
+Epoch 50  Loss:412493.96875
+Epoch 60  Loss:404745.34375
+Epoch 70  Loss:403019.5
+Epoch 80  Loss:396070.34375
+Epoch 90  Loss:395631.75
+Epoch 99  Loss:395618.46875
+Completed training with loss: 395618.46875; Time: 56.764387067159014
 done fraction 0 out of 1

@@ -5,8 +5,8 @@ import os
 from torch.distributed import ReduceOp, reduce
 from .losses import beta_gaussian_kldiv, mse_loss
 
-def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
-           model, optimizer,scheduler,fraction=0,total_fractions=1):
+def train(rank, EPOCHS, train_loader,model,
+           optimizer,scheduler,fraction=0,total_fractions=1):
 
     if rank==0:
         train_losses=[] if fraction==0 else torch.load('losses/losses.pt') 
@@ -23,8 +23,10 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
             if rank==0:
 
                 if epoch%10==0 or epoch==EPOCHS-1:
-                    print(f"Epoch {epoch}  Loss:{train_losses[-1]}",flush=True)
+                    print(f"Epoch {epoch+EPOCHS*fraction}  Loss:{train_losses[-1]}",flush=True)
+        
         scheduler.step()
+        
 
     if rank==0:
         print(f"Completed training with loss: {train_losses[-1]}; Time: {(time.time()-start_time)/60}",flush=True)
@@ -34,7 +36,7 @@ def train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
         if fraction!=total_fractions-1:
             torch.save(train_losses,'losses/losses.pt')
         else:
-            plot_losses(LEARNING_RATE, LATENT_DIM, train_losses)
+            plot_losses(train_losses)
             os.remove('losses/losses.pt')
 
 
@@ -71,7 +73,7 @@ def evaluate(model,data_loader,device, losses=None):
         losses.append(avg_loss.item())
 
 
-def plot_losses(LEARNING_RATE, LATENT_DIM, train_losses):
+def plot_losses(train_losses):
     plt.plot(train_losses,label='Train')
     plt.xlabel("Epoch")
     plt.ylabel("Reconstruction Loss")

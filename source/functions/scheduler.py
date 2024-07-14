@@ -1,5 +1,4 @@
 import torch
-from typing import List
 
 def lr_scheduler(optimizer:torch.optim.Optimizer,
                  initial_lr:float,
@@ -8,39 +7,29 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
                  total_epochs:int,
                  start_epoch:int=0):
     
-    warmup_epochs=int(total_epochs*0.1)
-    steady_epochs=0
-    anneal_epochs=total_epochs-warmup_epochs
+    increasing_epochs=int(total_epochs*0.1)
+    decreasing_epochs=total_epochs-increasing_epochs
 
-    for grp in optimizer.param_groups:
-        grp["lr"]=steady_lr
-
-    warmup_scheduler=torch.optim.lr_scheduler.LinearLR(
+    increasing_scheduler=torch.optim.lr_scheduler.LinearLR(
         optimizer=optimizer,
-        start_factor=initial_lr/steady_lr,
-        end_factor=1.0,
-        total_iters=warmup_epochs,
+        start_factor=initial_lr,
+        end_factor=steady_lr,
+        total_iters=increasing_epochs,
     )
 
-    steady_scheduler=torch.optim.lr_scheduler.ConstantLR(
+    decreasing_scheduler=torch.optim.lr_scheduler.LinearLR(
         optimizer=optimizer,
-        factor=1.0,
-        total_iters=steady_epochs,
-    )
-
-    anneal_scheduler=torch.optim.lr_scheduler.LinearLR(
-        optimizer=optimizer,
-        start_factor=1.0,
-        end_factor=final_lr/steady_lr,
-        total_iters=anneal_epochs,
+        start_factor=steady_lr,
+        end_factor=final_lr,
+        total_iters=decreasing_epochs,
     )
 
     scheduler=torch.optim.lr_scheduler.SequentialLR(
         optimizer,
-        schedulers=[warmup_scheduler,steady_scheduler,anneal_scheduler],
-        milestones=[warmup_epochs,warmup_epochs+steady_epochs],
+        schedulers=[increasing_scheduler,decreasing_scheduler],
+        milestones=[increasing_epochs],
+        last_epoch=start_epoch-1
     )
     
-    scheduler.last_epoch=start_epoch-1
 
     return optimizer,scheduler

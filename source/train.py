@@ -20,7 +20,9 @@ def main(rank:int,world_size:int):
     parser.add_argument('--fraction',type=int,default=0)
     parser.add_argument('--total_fractions',type=int,default=1)
     parser.add_argument('--weights',type=str,default='None')
-    parser.add_argument('--learning_rate',type=float,default=0.00005)
+    parser.add_argument('--initial_learning_rate',type=float,default=1e-4)
+    parser.add_argument('--steady_learning_rate',type=float,default=0.002)
+    parser.add_argument('--final_learning_rate',type=float,default=1e-6)
     parser.add_argument('--epochs',type=int,default=100)
     parser.add_argument('--batch_size',type=int,default=1024)
     parser.add_argument('--latent_dim',type=int,default=256)
@@ -30,7 +32,9 @@ def main(rank:int,world_size:int):
     FRACTION=args.fraction
     TOTAL_FRACTIONS=args.total_fractions
     WEIGHTS=None if args.weights=='None' else args.weights
-    LEARNING_RATE = args.learning_rate
+    INITIAL_LR = args.initial_learning_rate
+    STEADY_LR = args.steady_learning_rate
+    FINAL_LR = args.final_learning_rate
     EPOCHS = args.epochs
     BATCH_SIZE = args.batch_size
     LATENT_DIM = args.latent_dim
@@ -42,11 +46,11 @@ def main(rank:int,world_size:int):
         model.load_state_dict(torch.load(WEIGHTS))
     
     model=DDP(model,device_ids=[rank])
-    optimizer=optim.Adam(params=model.parameters(), lr=LEARNING_RATE, weight_decay=0,betas=(0.9,0.95))
+    optimizer=optim.Adam(params=model.parameters(), lr=1, weight_decay=0,betas=(0.9,0.95))
 
-    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=1e-4,steady_lr=0.002,final_lr=1e-6,total_epochs=EPOCHS*TOTAL_FRACTIONS,start_epoch=FRACTION*EPOCHS)
+    optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=INITIAL_LR,steady_lr=STEADY_LR,final_lr=FINAL_LR,total_epochs=EPOCHS*TOTAL_FRACTIONS,start_epoch=FRACTION*EPOCHS)
 
-    train(rank, LEARNING_RATE, EPOCHS, LATENT_DIM, train_loader,
+    train(rank, EPOCHS, train_loader,
             model, optimizer,scheduler,FRACTION,TOTAL_FRACTIONS) 
     destroy_process_group()
 
