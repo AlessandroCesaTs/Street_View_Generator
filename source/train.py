@@ -10,7 +10,8 @@ from functions.data_handling import prepare_data
 from functions.ddp_setup import ddp_setup
 from functions.data_handling import prepare_data
 from functions.training_functions import train
-from functions.scheduler import lr_scheduler
+from functions.schedulers import lr_scheduler
+
 
 def main(rank:int,world_size:int):
 

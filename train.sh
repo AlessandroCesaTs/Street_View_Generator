@@ -5,9 +5,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus=2 # Number of GPUs per node
-#SBATCH --exclusive
 #SBATCH --mem=0
-#SBATCH --time=01:00:00
+#SBATCH --exclusive
+#SBATCH --time=1:00:00
 
 fraction=${1:-0}
 total_fractions=${2:-1}

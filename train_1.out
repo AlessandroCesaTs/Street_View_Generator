@@ -1,14 +1,14 @@
 started fraction 1 out of 1
-Epoch 100  Loss:380676.75
-Epoch 110  Loss:379758.6875
-Epoch 120  Loss:379711.46875
-Epoch 130  Loss:379702.3125
-Epoch 140  Loss:379698.9375
-Epoch 150  Loss:379643.0
-Epoch 160  Loss:379622.53125
-Epoch 170  Loss:379627.375
-Epoch 180  Loss:379569.625
-Epoch 190  Loss:379576.21875
-Epoch 199  Loss:379606.90625
-Completed training with loss: 379606.90625; Time: 51.9881535132726
+Epoch 100  Loss:273704.125
+Epoch 110  Loss:273027.3125
+Epoch 120  Loss:272966.1875
+Epoch 130  Loss:272973.75
+Epoch 140  Loss:272975.25
+Epoch 150  Loss:272955.0
+Epoch 160  Loss:272949.3125
+Epoch 170  Loss:273004.40625
+Epoch 180  Loss:273006.9375
+Epoch 190  Loss:273144.03125
+Epoch 199  Loss:273555.0
+Completed training with loss: 273555.0; Time: 57.18676592508952
 done fraction 1 out of 1

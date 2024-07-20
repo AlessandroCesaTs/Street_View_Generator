@@ -9,6 +9,5 @@ def mse_loss(input: torch.Tensor,target: torch.Tensor)-> torch.Tensor:
     return F.mse_loss(input,target,reduction='sum')
 
 @torch.jit.script
-def beta_gaussian_kldiv(mu: torch.Tensor,sigma: torch.Tensor, beta: float=1.0)-> torch.Tensor:
-    kldiv=0.5*(torch.pow(mu,2)+torch.exp(sigma)-sigma-1).sum()
-    return beta*kldiv
+def beta_gaussian_kldiv(mu: torch.Tensor,sigma: torch.Tensor)-> torch.Tensor:
+    return 0.5*(torch.pow(mu,2)+torch.exp(sigma)-sigma-1).sum()

@@ -33,3 +33,6 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
     
 
     return optimizer,scheduler
+
+def beta_scheduler(epoch:int,tot_epochs:int):
+    return epoch*2/tot_epochs
