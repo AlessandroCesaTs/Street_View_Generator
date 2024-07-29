@@ -26,8 +26,6 @@ class Trainer():
         self.num_batches=len(self.data_loader)
         self.start_time=time.time()
 
-        model=DDP(model,device_ids=[device])
-
         if self.is_parallel and self.device!=0:
             self.is_master_rank=False
         else:
@@ -44,6 +42,7 @@ class Trainer():
     def train(self,EPOCHS):
         for epoch in range(EPOCHS):
             actual_epoch=epoch+EPOCHS*self.fraction
+            self.model.train()
             self.train_epoch()
 
             self.model.eval()

@@ -15,7 +15,7 @@ from functions.trainer import Trainer
 def main(device,world_size:int):
 
     IS_PARALLEL=torch.cuda.is_available() and world_size>1
-
+    print(f"Is parallel {IS_PARALLEL}",flush=True)
     if IS_PARALLEL:
         ddp_setup(device,world_size,1234)
 
@@ -47,9 +47,14 @@ def main(device,world_size:int):
     data_loader= prepare_data(DATA_PATH,world_size, BATCH_SIZE,IS_PARALLEL)
 
     model=VariationalAutoEncoder(latent_dim=LATENT_DIM).to(device)
-
+    
     if IS_PARALLEL:
         model=DDP(model,device_ids=[device])
+
+    model_parameters=model.module.parameters() if IS_PARALLEL else model.parameters()
+
+    optimizer = torch.optim.Adam(model_parameters, lr=1, weight_decay=0, betas=(0.9, 0.95))
+
 
     if FRACTION!=0:
         checkpoint=torch.load(CHECKPOINT_PATH)
@@ -58,12 +63,9 @@ def main(device,world_size:int):
             model.module.load_state_dict(model_state_dict)
         else:
             model.load_state_dict(model_state_dict)
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     else:
         checkpoint=None
-
-    model_parameters=model.module.parameters() if IS_PARALLEL else model.parameters()
-
-    optimizer = torch.optim.Adam(model_parameters, lr=1, weight_decay=0, betas=(0.9, 0.95))
 
     optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=INITIAL_LR,steady_lr=STEADY_LR,final_lr=FINAL_LR,total_epochs=EPOCHS*TOTAL_FRACTIONS)
 
@@ -81,4 +83,3 @@ if __name__ =="__main__":
         mp.spawn(main,args=(world_size,),nprocs=world_size)
     else:
         main('cpu',1)
-
