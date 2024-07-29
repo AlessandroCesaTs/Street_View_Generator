@@ -1,18 +1,29 @@
 started fraction 0 out of 1
-Epoch 0  Loss:973731.125
-Epoch 10  Loss:379951.6875
+reconstructuion 313456.0
+kl div 60135.2109375
+perceptual 0.09719285368919373
+total 373591.3125
+Epoch 0  Loss:373591.3081303537
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
 /orfeo/cephfs/home/dssc/acesa000/Street_View_Generator/environment/lib/python3.10/site-packages/torch/optim/lr_scheduler.py:156: UserWarning: The epoch parameter in `scheduler.step()` was not necessary and is being deprecated where possible. Please use `scheduler.step()` to step the scheduler. During the deprecation, if epoch is different from None, the closed form is used instead of the new chainable form, where available. Please open an issue if you are unable to replicate your use case: https://github.com/pytorch/pytorch/issues/new/choose.
   warnings.warn(EPOCH_DEPRECATION_WARNING, UserWarning)
-Epoch 20  Loss:355165.09375
-Epoch 30  Loss:331184.875
-Epoch 40  Loss:314244.5
-Epoch 50  Loss:307588.375
-Epoch 60  Loss:298753.875
-Epoch 70  Loss:294626.25
-Epoch 80  Loss:287520.125
-Epoch 90  Loss:285848.78125
-Epoch 99  Loss:286894.6875
-Completed training with loss: 286894.6875; Time: 57.253241368134816
+reconstructuion 358872.6875
+kl div 42342.9375
+perceptual 0.09816034138202667
+total 401215.71875
+reconstructuion 314325.25
+kl div 36149.0
+perceptual 0.0966077595949173
+total 350474.34375
+reconstructuion 313623.6875
+kl div 32606.794921875
+perceptual 0.09599912166595459
+total 346230.5625
+reconstructuion 294843.8125
+kl div 28835.96484375
+perceptual 0.09524941444396973
+total 323679.875
+Epoch 4  Loss:323679.87259316444
+Completed training with loss: 323679.87259316444; Time: 6.280332692464193
 done fraction 0 out of 1

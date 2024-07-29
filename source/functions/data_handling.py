@@ -16,12 +16,14 @@ class CustomDataset(Dataset):
         return image,label
 
 
-def prepare_data(data_path,world_size, BATCH_SIZE):
+def prepare_data(data_path,world_size, BATCH_SIZE,is_parallel):
     data=torch.load(data_path)
     dataset=CustomDataset(data)
 
     batch_size_per_process=int(BATCH_SIZE/world_size)
-
-    data_loader=DataLoader(dataset,batch_size=batch_size_per_process,shuffle=False,sampler=DistributedSampler(dataset))
+    if is_parallel:
+        data_loader=DataLoader(dataset,batch_size=batch_size_per_process,shuffle=False,sampler=DistributedSampler(dataset))
+    else:
+        data_loader=DataLoader(dataset,batch_size=batch_size_per_process,shuffle=True)
     return data_loader
     

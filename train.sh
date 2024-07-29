@@ -11,13 +11,13 @@
 
 fraction=${1:-0}
 total_fractions=${2:-1}
-weights=${3:-None}
+checkpoint=${3:-None}
 
 source environment/bin/activate
 
 echo "started fraction $fraction out of $(($total_fractions - 1))"
 
-srun python -u source/train.py --fraction=$fraction --total_fractions=$total_fractions --weights=$weights --epochs=100
+srun python -u source/train.py --fraction=$fraction --total_fractions=$total_fractions --checkpoint=$checkpoint --epochs=5
 
 echo "done fraction $fraction out of $(($total_fractions - 1))"
 

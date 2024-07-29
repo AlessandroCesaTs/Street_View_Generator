@@ -4,8 +4,7 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
                  initial_lr:float,
                  steady_lr:float,
                  final_lr:float,
-                 total_epochs:int,
-                 start_epoch:int=0):
+                 total_epochs:int):
     
     increasing_epochs=int(total_epochs*0.1)
     decreasing_epochs=total_epochs-increasing_epochs
@@ -28,10 +27,8 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
         optimizer,
         schedulers=[increasing_scheduler,decreasing_scheduler],
         milestones=[increasing_epochs],
-        last_epoch=start_epoch-1
     )
     
-
     return optimizer,scheduler
 
 def beta_scheduler(epoch:int,tot_epochs:int):

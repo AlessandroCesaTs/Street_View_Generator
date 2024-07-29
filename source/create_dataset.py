@@ -1,16 +1,25 @@
 import os
+import argparse
 import torch
 import numpy as np
 import pandas as pd
 from PIL import Image
 from functions.country_name_handling import CountryNameHandler
 
-base_directory='/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset/images/test'
-output_dir = '/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset_processed.pt'
+parser = argparse.ArgumentParser()
+parser.add_argument('--raw_data_directory',type=str,default='/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset/images/test')
+parser.add_argument('--output_directory',type=int,default='/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset_processed.pt')
+parser.add_argument('--metadata_directory',type=str,default='/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset/test.csv')
+
+args = parser.parse_args()
+
+raw_data_directory=args.raw_data
+output_directory=args.output_directory
+metadatadata_directory=args.metadata
 
 encoder=CountryNameHandler()
 
-metadata=pd.read_csv("/u/dssc/acesa000/fast/Street_View_Generator_data/hf_dataset/test.csv")
+metadata=pd.read_csv(metadatadata_directory)
 metadata=metadata[['id','country']]
 metadata['country_encoding']=metadata.apply(lambda row: encoder.get_country_from_code(row['country']), axis=1)
 metadata.drop(['country'],axis=1,inplace=True)
@@ -18,7 +27,7 @@ metadata.dropna(inplace=True)
 
 dataset=[]
 
-for folder in [base_directory+"/00",base_directory+"/01",base_directory+"/02",base_directory+"/03",base_directory+"/04"]:
+for folder in [raw_data_directory+"/00",raw_data_directory+"/01",raw_data_directory+"/02",raw_data_directory+"/03",raw_data_directory+"/04"]:
     images = os.listdir(folder)
     for image in images:
         image_path = os.path.join(folder, image)
@@ -36,7 +45,7 @@ for folder in [base_directory+"/00",base_directory+"/01",base_directory+"/02",ba
             
             data_point = (image_tensor, country_encoding)
             dataset.append(data_point)
-torch.save(dataset,output_dir)
+torch.save(dataset,output_directory)
 
 
         
