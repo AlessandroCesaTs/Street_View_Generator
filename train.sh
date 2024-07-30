@@ -4,20 +4,21 @@
 #SBATCH --partition=GPU
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gpus=2 # Number of GPUs per node
-#SBATCH --mem=0
+#SBATCH --gpus=2
 #SBATCH --exclusive
+#SBATCH --mem=0
 #SBATCH --time=1:00:00
 
-fraction=${1:-0}
-total_fractions=${2:-1}
-checkpoint=${3:-None}
+data_path=$1
+output_path=$2
+fraction=${3:-0}
+total_fractions=${4:-1}
 
 source environment/bin/activate
 
-echo "started fraction $fraction out of $(($total_fractions - 1))"
+echo "started fraction $fraction out of $(($total_fractions))"
 
-srun python -u source/train.py --fraction=$fraction --total_fractions=$total_fractions --checkpoint=$checkpoint --epochs=5
+srun python -u source/train.py --fraction=$fraction --total_fractions=$total_fractions --data_path=$data_path --output_path=$output_path --epochs=3
 
-echo "done fraction $fraction out of $(($total_fractions - 1))"
+echo "done fraction $fraction out of $(($total_fractions))"
 

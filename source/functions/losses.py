@@ -26,5 +26,5 @@ class PerceptualLoss(nn.Module):
 
     def forward(self, x, y):
         x_resnet, y_resnet = self.layers(x), self.layers(y)
-        loss = F.mse_loss(x_resnet, y_resnet)
+        loss = F.mse_loss(x_resnet, y_resnet,reduction='sum')
         return loss

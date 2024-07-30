@@ -1,47 +1,60 @@
+import os
+import csv
 import torch
+import time
 from torch.nn.parallel import DistributedDataParallel as DDP
 import matplotlib.pyplot as plt
-import time
 from torch.distributed import ReduceOp, reduce
 from .losses import beta_gaussian_kldiv, mse_loss,PerceptualLoss
-from functions.schedulers import lr_scheduler
-
 
 class Trainer():
-    def __init__(self,data_loader,model,optimizer,scheduler,device,
-                 fraction=0,total_fractions=1,is_parallel=False,checkpoint_path=None,checkpoint=None):
+    def __init__(self,data_loader,model,optimizer,scheduler,device,is_parallel=False,
+                 resume_from_checkpoint=False,checkpoint=None,output_path=None):
         self.data_loader=data_loader
         self.model=model
         self.optimizer=optimizer
         self.scheduler=scheduler
-        self.fraction=fraction
-        self.total_fractions=total_fractions
         self.device=device
         self.is_parallel=is_parallel
-        self.checkpoint_path=checkpoint_path
         self.checkpoint=checkpoint
 
         self.perceptual_loss_function=PerceptualLoss().to(self.device)
-        self.beta=1
+        self.perceptual_loss_function.eval()
         self.num_batches=len(self.data_loader)
         self.start_time=time.time()
-
+        
         if self.is_parallel and self.device!=0:
             self.is_master_rank=False
         else:
             self.is_master_rank=True
 
-        if fraction==0:
+        if self.is_master_rank:
+            os.makedirs(os.path.join(output_path, 'checkpoints'), exist_ok=True)
+            os.makedirs(os.path.join(output_path, 'models'), exist_ok=True)
+            os.makedirs(os.path.join(output_path, 'plots'), exist_ok=True)
+            os.makedirs(os.path.join(output_path, 'losses'), exist_ok=True)
+
+        self.checkpoint_path=os.path.join(output_path, 'checkpoints','checkpoint.pt') if self.is_master_rank else None
+        self.model_path=os.path.join(output_path, 'models','model.pt') if self.is_master_rank else None
+        self.plots_path=os.path.join(output_path, 'plots') if self.is_master_rank else None
+        self.losses_file_path=os.path.join(output_path,'losses','losses.csv') if self.is_master_rank else None
+
+        if self.is_master_rank and not resume_from_checkpoint:
+            with open(self.losses_file_path, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['Epoch','Reconstruction Loss','KL Divergence','Perceptual Loss','Total Loss'])
+
+        if resume_from_checkpoint:
+            self.load_checkpoint()
+        else:
             self.total_losses=[] if self.is_master_rank else None
             self.reconstruction_losses=[] if self.is_master_rank else None
             self.kl_divergences=[] if self.is_master_rank else None
             self.perceptual_losses=[] if self.is_master_rank else None
-        else:
-            self.load_checkpoint()
+            self.last_epoch=0
 
     def train(self,EPOCHS):
-        for epoch in range(EPOCHS):
-            actual_epoch=epoch+EPOCHS*self.fraction
+        for epoch in range(self.last_epoch,self.last_epoch+EPOCHS):
             self.model.train()
             self.train_epoch()
 
@@ -49,21 +62,15 @@ class Trainer():
             with torch.no_grad():
                 self.evaluate()
 
-                if self.is_master_rank and (epoch%10==0 or epoch==EPOCHS-1):
-                    print(f"Epoch {actual_epoch}  Loss:{self.total_losses[-1]}",flush=True)
+                if self.is_master_rank and (epoch%10==0 or epoch==self.last_epoch or epoch==self.last_epoch+EPOCHS-1):
+                    self.record_losses(epoch)
             
             self.scheduler.step()
 
         if self.is_master_rank:
-            print(f"Completed training with loss: {self.total_losses[-1]}; Time: {(time.time()-self.start_time)/60}",flush=True)
-
-            if self.fraction!=self.total_fractions-1:
-                self.save_checkpoint()
-            else:
-                self.plot_losses(self.reconstruction_losses,'reconstruction_losses')
-                self.plot_losses(self.kl_divergences,'kl_divergences')
-                self.plot_losses(self.perceptual_losses,'perceptual_losses')
-                self.plot_losses(self.total_losses,'total_losses')
+            print(f"Completed training; Time: {(time.time()-self.start_time)/60}",flush=True)
+            self.save_checkpoint(EPOCHS)
+                
 
     def train_epoch(self):
         for _,data_point in enumerate(self.data_loader):
@@ -71,7 +78,7 @@ class Trainer():
             label=data_point[1].to(self.device)
 
             generated_image,mu,log_var=self.model(image,label)
-            loss=mse_loss(image,generated_image)+self.beta*beta_gaussian_kldiv(mu,log_var)+self.perceptual_loss_function(image,generated_image)
+            loss=mse_loss(image,generated_image)+beta_gaussian_kldiv(mu,log_var)+0.01*self.perceptual_loss_function(image,generated_image)
 
             self.optimizer.zero_grad()
 
@@ -104,25 +111,13 @@ class Trainer():
             reduce(avg_perceptual_loss,dst=0,op=ReduceOp.SUM)
 
         if self.is_master_rank :
-            print(f"reconstructuion {avg_reconstruction_loss}",flush=True)
-            print(f"kl div {avg_kl_divergence}",flush=True)
-            print(f"perceptual {avg_perceptual_loss}",flush=True)
-            print(f"total {avg_reconstruction_loss+avg_kl_divergence+avg_perceptual_loss}",flush=True)
-
             self.reconstruction_losses.append(avg_reconstruction_loss.item())
             self.kl_divergences.append(avg_kl_divergence.item())
             self.perceptual_losses.append(avg_perceptual_loss.item())
-            self.total_losses.append(self.reconstruction_losses[-1]+self.kl_divergences[-1]+self.perceptual_losses[-1])
+            self.total_losses.append(self.reconstruction_losses[-1]+self.kl_divergences[-1]+0.01*self.perceptual_losses[-1])
 
-    def plot_losses(self,losses,name):
-        plt.plot(losses,label='Losses')
-        plt.xlabel("Epoch")
-        plt.ylabel(str(name))
-        plt.legend()
-        plt.savefig('plots/'+str(name)+'_plot.png')
-        plt.close()
 
-    def save_checkpoint(self):
+    def save_checkpoint(self,epoch):
         state = {
             'model_state_dict': self.model.module.state_dict() if self.is_parallel else self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
@@ -130,12 +125,33 @@ class Trainer():
             'reconstruction_losses': self.reconstruction_losses,
             'kl_divergences': self.kl_divergences,
             'perceptual_losses': self.perceptual_losses,
-            'total_losses': self.total_losses
+            'total_losses': self.total_losses,
+            'epoch':epoch
         }
-        torch.save(state, self.checkpoint_path)
+        torch.save(state,self.checkpoint_path)
+        torch.save(state['model_state_dict'],self.model_path)
+        self.plot_losses(self.reconstruction_losses,'reconstruction_losses')
+        self.plot_losses(self.kl_divergences,'kl_divergences')
+        self.plot_losses(self.perceptual_losses,'perceptual_losses')
+        self.plot_losses(self.total_losses,'total_losses')
     
     def load_checkpoint(self):
         self.reconstruction_losses=self.checkpoint['reconstruction_losses'] if self.is_master_rank else None
         self.kl_divergences=self.checkpoint['kl_divergences'] if self.is_master_rank else None
         self.perceptual_losses=self.checkpoint['perceptual_losses'] if self.is_master_rank else None
         self.total_losses=self.checkpoint['total_losses'] if self.is_master_rank else None
+        self.last_epoch=self.checkpoint['epoch']
+
+    def plot_losses(self,losses,name):
+        path=os.path.join(self.plots_path,str(name)+'_plot.png')
+        plt.plot(losses,label=str(name))
+        plt.xlabel("Epoch")
+        plt.ylabel(str(name))
+        plt.legend()
+        plt.savefig(path)
+        plt.close()
+
+    def record_losses(self,epoch):
+        with open (self.losses_file_path,mode='a',newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([epoch,self.reconstruction_losses[-1],self.kl_divergences[-1],self.perceptual_losses[-1],self.total_losses[-1]])

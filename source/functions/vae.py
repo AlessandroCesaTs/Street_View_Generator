@@ -96,8 +96,6 @@ class VariationalAutoEncoder(nn.Module):
     def forward(self,input_image:torch.Tensor,input_label:torch.Tensor)->tuple[torch.Tensor,torch.Tensor,torch.Tensor]:
         mu,log_var=self.linear_neck(self.image_encoder(input_image),self.label_embedder(input_label))
         latent=self.sampler(mu,log_var)
-        print(f"mu is {mu}",flush=True)
-        print(f"log_var is {log_var}",flush=True)
         x=torch.cat((latent,self.label_embedder(input_label)),dim=1)
         x=self.linear_with_label(x)
         x=x.view((-1,256,8,8))
