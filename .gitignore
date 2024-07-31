@@ -4,6 +4,9 @@ environment
 #slurm outputs
 *.out
 
+#checkpoints
+*checkpoint.pt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

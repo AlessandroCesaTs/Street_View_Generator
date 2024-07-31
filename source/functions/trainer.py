@@ -5,7 +5,7 @@ import time
 from torch.nn.parallel import DistributedDataParallel as DDP
 import matplotlib.pyplot as plt
 from torch.distributed import ReduceOp, reduce
-from .losses import gaussian_kldiv, mse_loss,PerceptualLoss
+from .losses import gaussian_kldiv, mse_loss
 
 class Trainer():
     def __init__(self,data_loader,model,optimizer,scheduler,beta_scheduler,device,is_parallel=False,
@@ -19,8 +19,6 @@ class Trainer():
         self.is_parallel=is_parallel
         self.checkpoint=checkpoint
 
-        self.perceptual_loss_function=PerceptualLoss().to(self.device)
-        self.perceptual_loss_function.eval()
         self.num_batches=len(self.data_loader)
         self.start_time=time.time()
         
@@ -43,7 +41,7 @@ class Trainer():
         if self.is_master_rank and not resume_from_checkpoint:
             with open(self.losses_file_path, mode='w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(['Epoch','Reconstruction Loss','KL Divergence','Perceptual Loss','Total Loss'])
+                writer.writerow(['Epoch','Reconstruction Loss','KL Divergence','Total Loss'])
 
         if resume_from_checkpoint:
             self.load_checkpoint()
@@ -51,7 +49,6 @@ class Trainer():
             self.total_losses=[] if self.is_master_rank else None
             self.reconstruction_losses=[] if self.is_master_rank else None
             self.kl_divergences=[] if self.is_master_rank else None
-            self.perceptual_losses=[] if self.is_master_rank else None
             self.last_epoch=0
 
     def train(self,EPOCHS):
@@ -80,7 +77,7 @@ class Trainer():
             label=data_point[1].to(self.device)
 
             generated_image,mu,log_var=self.model(image,label)
-            loss=mse_loss(image,generated_image)+beta*gaussian_kldiv(mu,log_var)+0.001*self.perceptual_loss_function(image,generated_image)
+            loss=mse_loss(image,generated_image)+beta*gaussian_kldiv(mu,log_var)
             self.optimizer.zero_grad()
 
             loss.backward()
@@ -90,7 +87,6 @@ class Trainer():
     def evaluate(self,beta):
         reconstruction_loss=0
         kl_divergence=0
-        perceptual_loss=0
 
         for _,data_point in enumerate(self.data_loader):
             image=data_point[0].to(self.device)
@@ -100,22 +96,18 @@ class Trainer():
 
             reconstruction_loss+=mse_loss(image,generated_image)
             kl_divergence+=gaussian_kldiv(mu,log_var)
-            perceptual_loss+=self.perceptual_loss_function(image,generated_image)
 
         avg_reconstruction_loss=reconstruction_loss/self.num_batches
         avg_kl_divergence=kl_divergence/self.num_batches
-        avg_perceptual_loss=perceptual_loss/self.num_batches
         
         if self.is_parallel:
             reduce(avg_reconstruction_loss,dst=0,op=ReduceOp.SUM)
             reduce(avg_kl_divergence,dst=0,op=ReduceOp.SUM)
-            reduce(avg_perceptual_loss,dst=0,op=ReduceOp.SUM)
 
         if self.is_master_rank :
             self.reconstruction_losses.append(avg_reconstruction_loss.item())
             self.kl_divergences.append(avg_kl_divergence.item())
-            self.perceptual_losses.append(avg_perceptual_loss.item())
-            self.total_losses.append(self.reconstruction_losses[-1]+beta*self.kl_divergences[-1]+0.001*self.perceptual_losses[-1])
+            self.total_losses.append(self.reconstruction_losses[-1]+beta*self.kl_divergences[-1])
 
     def save_checkpoint(self,epoch):
         state = {
@@ -124,7 +116,6 @@ class Trainer():
             'scheduler_state_dict': self.scheduler.state_dict(),
             'reconstruction_losses': self.reconstruction_losses,
             'kl_divergences': self.kl_divergences,
-            'perceptual_losses': self.perceptual_losses,
             'total_losses': self.total_losses,
             'epoch':epoch
         }
@@ -132,13 +123,11 @@ class Trainer():
         torch.save(state['model_state_dict'],self.model_path)
         self.plot_losses(self.reconstruction_losses,'reconstruction_losses')
         self.plot_losses(self.kl_divergences,'kl_divergences')
-        self.plot_losses(self.perceptual_losses,'perceptual_losses')
         self.plot_losses(self.total_losses,'total_losses')
     
     def load_checkpoint(self):
         self.reconstruction_losses=self.checkpoint['reconstruction_losses'] if self.is_master_rank else None
         self.kl_divergences=self.checkpoint['kl_divergences'] if self.is_master_rank else None
-        self.perceptual_losses=self.checkpoint['perceptual_losses'] if self.is_master_rank else None
         self.total_losses=self.checkpoint['total_losses'] if self.is_master_rank else None
         self.last_epoch=self.checkpoint['epoch']
 
@@ -154,4 +143,4 @@ class Trainer():
     def record_losses(self,epoch):
         with open (self.losses_file_path,mode='a',newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([epoch,self.reconstruction_losses[-1],self.kl_divergences[-1],self.perceptual_losses[-1],self.total_losses[-1]])
+            writer.writerow([epoch,self.reconstruction_losses[-1],self.kl_divergences[-1],self.total_losses[-1]])
