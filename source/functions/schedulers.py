@@ -31,5 +31,10 @@ def lr_scheduler(optimizer:torch.optim.Optimizer,
     
     return optimizer,scheduler
 
-def beta_scheduler(epoch:int,tot_epochs:int):
-    return epoch*2/tot_epochs
+class BetaScheduler():
+    def __init__(self,initial_beta,final_beta,total_epochs):
+        self.initial_beta=initial_beta
+        self.factor=(final_beta-initial_beta)/total_epochs
+
+    def get_beta(self,epoch):
+        return self.initial_beta+self.factor*epoch

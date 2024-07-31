@@ -5,15 +5,16 @@ import time
 from torch.nn.parallel import DistributedDataParallel as DDP
 import matplotlib.pyplot as plt
 from torch.distributed import ReduceOp, reduce
-from .losses import beta_gaussian_kldiv, mse_loss,PerceptualLoss
+from .losses import gaussian_kldiv, mse_loss,PerceptualLoss
 
 class Trainer():
-    def __init__(self,data_loader,model,optimizer,scheduler,device,is_parallel=False,
+    def __init__(self,data_loader,model,optimizer,scheduler,beta_scheduler,device,is_parallel=False,
                  resume_from_checkpoint=False,checkpoint=None,output_path=None):
         self.data_loader=data_loader
         self.model=model
         self.optimizer=optimizer
         self.scheduler=scheduler
+        self.beta_scheduler=beta_scheduler
         self.device=device
         self.is_parallel=is_parallel
         self.checkpoint=checkpoint
@@ -55,12 +56,13 @@ class Trainer():
 
     def train(self,EPOCHS):
         for epoch in range(self.last_epoch,self.last_epoch+EPOCHS):
+            beta=self.beta_scheduler.get_beta(epoch)
             self.model.train()
-            self.train_epoch()
+            self.train_epoch(beta)
 
             self.model.eval()
             with torch.no_grad():
-                self.evaluate()
+                self.evaluate(beta)
 
                 if self.is_master_rank and (epoch%10==0 or epoch==self.last_epoch or epoch==self.last_epoch+EPOCHS-1):
                     self.record_losses(epoch)
@@ -72,21 +74,20 @@ class Trainer():
             self.save_checkpoint(EPOCHS)
                 
 
-    def train_epoch(self):
+    def train_epoch(self,beta):
         for _,data_point in enumerate(self.data_loader):
             image=data_point[0].to(self.device)
             label=data_point[1].to(self.device)
 
             generated_image,mu,log_var=self.model(image,label)
-            loss=mse_loss(image,generated_image)+beta_gaussian_kldiv(mu,log_var)+0.01*self.perceptual_loss_function(image,generated_image)
-
+            loss=mse_loss(image,generated_image)+beta*gaussian_kldiv(mu,log_var)+0.001*self.perceptual_loss_function(image,generated_image)
             self.optimizer.zero_grad()
 
             loss.backward()
 
             self.optimizer.step()
     
-    def evaluate(self):
+    def evaluate(self,beta):
         reconstruction_loss=0
         kl_divergence=0
         perceptual_loss=0
@@ -98,9 +99,9 @@ class Trainer():
             generated_image,mu,log_var=self.model(image,label)
 
             reconstruction_loss+=mse_loss(image,generated_image)
-            kl_divergence+=beta_gaussian_kldiv(mu,log_var)
+            kl_divergence+=gaussian_kldiv(mu,log_var)
             perceptual_loss+=self.perceptual_loss_function(image,generated_image)
-        
+
         avg_reconstruction_loss=reconstruction_loss/self.num_batches
         avg_kl_divergence=kl_divergence/self.num_batches
         avg_perceptual_loss=perceptual_loss/self.num_batches
@@ -114,8 +115,7 @@ class Trainer():
             self.reconstruction_losses.append(avg_reconstruction_loss.item())
             self.kl_divergences.append(avg_kl_divergence.item())
             self.perceptual_losses.append(avg_perceptual_loss.item())
-            self.total_losses.append(self.reconstruction_losses[-1]+self.kl_divergences[-1]+0.01*self.perceptual_losses[-1])
-
+            self.total_losses.append(self.reconstruction_losses[-1]+beta*self.kl_divergences[-1]+0.001*self.perceptual_losses[-1])
 
     def save_checkpoint(self,epoch):
         state = {

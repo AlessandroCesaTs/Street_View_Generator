@@ -10,7 +10,7 @@ from functions.vae import VariationalAutoEncoder
 from functions.data_handling import prepare_data
 from functions.ddp_setup import ddp_setup
 from functions.data_handling import prepare_data
-from functions.schedulers import lr_scheduler
+from functions.schedulers import lr_scheduler,BetaScheduler
 from functions.trainer import Trainer
 
 def main(device,world_size:int):
@@ -27,8 +27,10 @@ def main(device,world_size:int):
     parser.add_argument('--initial_learning_rate',type=float,default=1e-4)
     parser.add_argument('--steady_learning_rate',type=float,default=0.002)
     parser.add_argument('--final_learning_rate',type=float,default=1e-6)
+    parser.add_argument('--initial_beta',type=float,default=0)
+    parser.add_argument('--final_beta',type=float,default=1)
     parser.add_argument('--epochs',type=int,default=100)
-    parser.add_argument('--batch_size',type=int,default=512)
+    parser.add_argument('--batch_size',type=int,default=1024)
     parser.add_argument('--latent_dim',type=int,default=256)
 
     args = parser.parse_args()
@@ -40,11 +42,13 @@ def main(device,world_size:int):
     INITIAL_LR = args.initial_learning_rate
     STEADY_LR = args.steady_learning_rate
     FINAL_LR = args.final_learning_rate
+    INITIAL_BETA = args.initial_beta
+    FINAL_BETA = args.final_beta
     EPOCHS = args.epochs
     BATCH_SIZE = args.batch_size
     LATENT_DIM = args.latent_dim
 
-    RESUME_FROM_CHECKPOINT = FRACTION==TOTAL_FRACTIONS
+    RESUME_FROM_CHECKPOINT = FRACTION!=1
 
     data_loader= prepare_data(DATA_PATH,world_size, BATCH_SIZE,IS_PARALLEL)
 
@@ -69,12 +73,12 @@ def main(device,world_size:int):
         checkpoint=None
 
     optimizer,scheduler=lr_scheduler(optimizer=optimizer,initial_lr=INITIAL_LR,steady_lr=STEADY_LR,final_lr=FINAL_LR,total_epochs=EPOCHS*TOTAL_FRACTIONS)
-
+    beta_scheduler=BetaScheduler(INITIAL_BETA,FINAL_BETA,EPOCHS*TOTAL_FRACTIONS)
     if RESUME_FROM_CHECKPOINT:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
     
-    trainer=Trainer(data_loader,model,optimizer,scheduler,device,IS_PARALLEL,RESUME_FROM_CHECKPOINT,checkpoint,OUTPUT_PATH)
+    trainer=Trainer(data_loader,model,optimizer,scheduler,beta_scheduler,device,IS_PARALLEL,RESUME_FROM_CHECKPOINT,checkpoint,OUTPUT_PATH)
 
     trainer.train(EPOCHS)
     if IS_PARALLEL:
