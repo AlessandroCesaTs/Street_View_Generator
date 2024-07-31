@@ -207,6 +207,7 @@ class CountryNameHandler:
 
         self.num_countries = len(country_names)
         self.countries_dict = {country: self._create_one_hot(idx) for idx, country in enumerate(country_names)}
+        self.device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
     def _create_one_hot(self,index):
@@ -215,7 +216,8 @@ class CountryNameHandler:
         return encoding
 
     def one_hot_encode(self, country):
-        return self.countries_dict.get(country,None)
+        encoding=self.countries_dict.get(country,None)
+        return encoding.to(self.device)
 
     def get_country_name(self,iso_code):
         return self.iso_country_dict.get(iso_code, None)

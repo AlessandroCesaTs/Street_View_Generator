@@ -18,7 +18,7 @@ source environment/bin/activate
 
 echo "started fraction $fraction out of $(($total_fractions))"
 
-srun python -u source/train.py --fraction=$fraction --total_fractions=$total_fractions --data_path=$data_path --output_path=$output_path --epochs=3
+srun python -u source/train.py --fraction=$fraction --total_fractions=$total_fractions --data_path=$data_path --output_path=$output_path --epochs=45
 
 echo "done fraction $fraction out of $(($total_fractions))"
 

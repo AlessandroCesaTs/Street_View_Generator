@@ -30,27 +30,27 @@ plt.imshow(data[0][0].permute(1,2,0))
 plt.savefig(os.path.join(images_path,'input_image.png'))
 plt.close()
 
-output_image=model(data[0][0].unsqueeze(0),data[1][1].unsqueeze(0))[0]
-plt.imshow(output_image[0].permute(1,2,0).detach().numpy() )
+output_image=model(data[0][0].unsqueeze(0).to(device),data[1][1].unsqueeze(0).to(device))[0]
+plt.imshow(output_image[0].permute(1,2,0).detach().cpu().numpy() )
 plt.savefig(os.path.join(images_path,'reconstructed_image.png'))
 plt.close()
 
 generated_usa_1=model.generate('United States')
-plt.imshow(generated_usa_1[0].permute(1,2,0).detach().numpy() )
+plt.imshow(generated_usa_1[0].permute(1,2,0).detach().cpu().numpy() )
 plt.savefig(os.path.join(images_path,'usa_1.png'))
 plt.close()
 
 generated_usa_2=model.generate('United States')
-plt.imshow(generated_usa_2[0].permute(1,2,0).detach().numpy() )
+plt.imshow(generated_usa_2[0].permute(1,2,0).detach().cpu().numpy() )
 plt.savefig(os.path.join(images_path,'usa_2.png'))
 plt.close()
 
 generated_italy=model.generate('Italy')
-plt.imshow(generated_italy[0].permute(1,2,0).detach().numpy() )
+plt.imshow(generated_italy[0].permute(1,2,0).detach().cpu().numpy() )
 plt.savefig(os.path.join(images_path,'italy.png'))
 plt.close()
 
 generated_morocco=model.generate('Morocco')
-plt.imshow(generated_morocco[0].permute(1,2,0).detach().numpy() )
+plt.imshow(generated_morocco[0].permute(1,2,0).detach().cpu().numpy() )
 plt.savefig(os.path.join(images_path,'morocco.png'))
 plt.close()

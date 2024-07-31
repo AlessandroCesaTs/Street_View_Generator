@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus=1
 #SBATCH --mem=64G
-#SBATCH --time=0:05:00   
+#SBATCH --time=0:10:00   
 
 data_path=$1
 model_path=$2

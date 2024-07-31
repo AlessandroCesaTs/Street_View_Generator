@@ -16,7 +16,7 @@ class CustomDataset(Dataset):
         return image,label
 
 def prepare_data(data_path,world_size, BATCH_SIZE,is_parallel):
-    data=torch.load(data_path)[:100]
+    data=torch.load(data_path)
     dataset=CustomDataset(data)
 
     batch_size_per_process=int(BATCH_SIZE/world_size)
