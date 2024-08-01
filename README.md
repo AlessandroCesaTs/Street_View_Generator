@@ -46,12 +46,10 @@ The scripts `.sh` scripts are intended to run on the cluster ORFEO of Trieste's 
 
 ### Download and pre process the dataset
 
-In order to download and pre process the dataset, run `bash create_dataset.sh <directory_where_you_want_the_dataset>`
+In order to download and pre process the dataset, run 
+`bash create_dataset.sh <directory_where_you_want_the_dataset>`
 
 ### Train the model and generate images 
 
-In order to train the model and generate some images, you have to run `bash train_and_generate <directory where you have downloaded the dataset>` 
-
-### Just train the model
-
-### Just generate images with trained model
+In order to train the model and generate some images, you have to run 
+`bash train_and_generate <directory where you have downloaded the dataset>` 
